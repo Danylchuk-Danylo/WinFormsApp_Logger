@@ -10,7 +10,6 @@ namespace WinFormsApp_Logger
         {
             InitializeComponent();
 
-            // Привязываем кнопки к методам
             button1.Click += new EventHandler(button1_Click);
             button2.Click += new EventHandler(button2_Click);
             button3.Click += new EventHandler(button3_Click);
@@ -28,7 +27,6 @@ namespace WinFormsApp_Logger
 
         private void button3_Click(object sender, EventArgs e)
         {
-            // Тест вызова логгера из разных потоков одновременно
             Thread thread1 = new Thread(SetMessage);
             Thread thread2 = new Thread(SetMessage);
 
