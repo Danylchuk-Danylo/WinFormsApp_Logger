@@ -16,7 +16,6 @@ namespace WinFormsApp_Logger
         private LoggerConfig _config;
         private bool _isWriting;
 
-        // Приватный конструктор для реализации Singleton
         private Logger()
         {
             _logQueue = new Queue<string>();
@@ -54,7 +53,6 @@ namespace WinFormsApp_Logger
                 File.WriteAllText(configPath, defaultJson);
             }
 
-            // Очищаем файл при запуске, если настройка AppendToFile выключена
             if (!_config.AppendToFile && File.Exists(_config.FileName))
             {
                 File.WriteAllText(_config.FileName, string.Empty);
@@ -63,7 +61,7 @@ namespace WinFormsApp_Logger
 
         public void LogData(LogLevel level, string message)
         {
-            // Форматируем строку как указано в задании
+
             string timestamp = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff");
             string logEntry = $"{timestamp} [{level}] : {message}";
 
@@ -71,11 +69,10 @@ namespace WinFormsApp_Logger
             {
                 _logQueue.Enqueue(logEntry);
 
-                // Если очередь достигла нужного размера (порции) и мы еще не пишем файл
+
                 if (_logQueue.Count >= _config.QueueNumber && !_isWriting)
                 {
                     _isWriting = true;
-                    // Запускаем запись в отдельном потоке (чтобы не висла форма)
                     Task.Run(() => FlushQueueToFile());
                 }
             }
@@ -95,7 +92,6 @@ namespace WinFormsApp_Logger
 
             if (linesToWrite.Count > 0)
             {
-                // Блокируем доступ к файлу, чтобы другие потоки его не сломали
                 lock (_fileLock)
                 {
                     File.AppendAllLines(_config.FileName, linesToWrite);
@@ -105,7 +101,6 @@ namespace WinFormsApp_Logger
             lock (_instanceLock)
             {
                 _isWriting = false;
-                // Проверяем, не накопились ли новые логи, пока мы записывали старые
                 if (_logQueue.Count >= _config.QueueNumber)
                 {
                     _isWriting = true;
